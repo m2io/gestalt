@@ -4,10 +4,11 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
+		"postinstall": "nuxt prepare",
 		"dev": "nuxt dev",
-		"build": "--bun nuxt generate",
-		"tauri": "tauri",
-		"lint": "eslint . --fix"
+		"build": "nuxt generate",
+		"lint": "eslint . --fix",
+		"tauri": "tauri"
 	},
 	"dependencies": {
 		"@tauri-apps/api": "^2.0.1",
