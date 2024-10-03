@@ -26,6 +26,11 @@ export default defineNuxtConfig({
 	future: {
 		compatibilityVersion: 4,
 	},
+	imports: {
+		dirs: [
+			'icons',
+		],
+	},
 	modules: ['@nuxt/eslint'],
 	postcss: {
 		plugins: {
