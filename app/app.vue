@@ -1,6 +1,16 @@
+<script setup lang="ts">
+window.addEventListener('contextmenu', (event) => {
+	if ((event as PointerEvent).pointerType === 'touch') {
+		event.preventDefault()
+	}
+})
+</script>
+
 <template>
 	<NuxtRouteAnnouncer />
-	<h1 class="text-5xl font-bold">
-		Hello Gestalt
-	</h1>
+	<AppIconSprite />
+	<main class="flex-1 flex flex-col p-4">
+		<NuxtPage />
+	</main>
+	<AppNavigation />
 </template>

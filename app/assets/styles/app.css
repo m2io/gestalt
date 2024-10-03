@@ -8,24 +8,28 @@
   html {
     -webkit-tap-highlight-color: transparent;
 		color-scheme: dark;
-  }
-
-  html,
-  body,
-  #__nuxt {
-    width: 100%;
+		width: 100%;
     height: 100%;
   }
 
-
   body {
-		background-color: var(--color-zinc-950);
+		background-color: var(--color-zinc-900);
 		color: var(--color-zinc-50);
 		font-family: var(--font-geist);
 		overflow-x: hidden;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
+
+		width: 100%;
+    height: 100%;
   }
+
+	#__nuxt {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+    height: 100%;
+	}
 	
 	.font-geist {
 		font-family: var(--font-geist);
