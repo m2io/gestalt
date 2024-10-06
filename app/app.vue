@@ -4,6 +4,18 @@ window.addEventListener('contextmenu', (event) => {
 		event.preventDefault()
 	}
 })
+
+const { loadDatabase } = useDatabase()
+const weightStore = useWeightStore()
+onMounted(async () => {
+	try {
+		await loadDatabase()
+		await weightStore.getWeights()
+	} catch (err) {
+		console.error('[App.vue] Failed to initialize:', err)
+		// TODO: Implement proper error handling
+	}
+})
 </script>
 
 <template>

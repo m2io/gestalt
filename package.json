@@ -12,6 +12,7 @@
 		"android": "tauri android"
 	},
 	"dependencies": {
+		"@pinia/nuxt": "^0.5.5",
 		"@tauri-apps/api": "^2.0.1",
 		"@tauri-apps/plugin-shell": "^2.0.0",
 		"@tauri-apps/plugin-sql": "^2.0.0",
