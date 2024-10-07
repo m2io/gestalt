@@ -31,7 +31,7 @@ export default defineNuxtConfig({
 			'icons',
 		],
 	},
-	modules: ['@nuxt/eslint', '@pinia/nuxt'],
+	modules: ['@nuxt/eslint', '@pinia/nuxt', '@vueuse/nuxt'],
 	postcss: {
 		plugins: {
 			'@tailwindcss/postcss': {},

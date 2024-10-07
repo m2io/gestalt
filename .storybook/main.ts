@@ -30,9 +30,10 @@ export default {
 					dts: false,
 				}),
 				AutoImport({
-					imports: ['vue', '@vueuse/core', 'vue-router'],
+					imports: ['vue', '@vueuse/core', 'vue-router', 'pinia'],
 					dirs: [
 						join(__dirname, '../app/composables/**'),
+						join(__dirname, '../app/stores/**'),
 					],
 					vueTemplate: true,
 					dts: false,
