@@ -5,7 +5,7 @@ export default {
 	decorators: [
 		(story) => ({
 			components: { story, AppSvgSprite },
-			template: '<div class="p-4"><AppSvgSprite /><story /></div>',
+			template: '<div><AppSvgSprite /><story /></div>',
 		}),
 	],
 }
