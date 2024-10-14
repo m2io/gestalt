@@ -1,35 +1,77 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { useDatabase } from '../composables/useDatabase'
-
-export interface WeightEntry {
-	id: number
-	weight: number
-	date: string
-}
+import type { WeightEntry, WeightProgress } from '@/types/weight'
+import dayjs from 'dayjs'
 
 export const useWeightStore = defineStore('weightStore', () => {
 	const { getConnection } = useDatabase()
 	const weightStoreIsLoading = ref(false)
 	const weightEntries = ref<WeightEntry[]>([])
 
+	const parsedWeightHistory = computed<WeightEntry[]>(() => {
+		return weightEntries.value.map((entry, index) => ({
+			...entry,
+			weight_display: `${entry.weight} kg`,
+			date_display: dayjs(entry.date).format('MMM D, YYYY'),
+			progress: determineProgress(entry, index),
+		}))
+	})
+
+	const mappedEntryDates = computed(() => {
+		const dates = {} as Record<string, WeightEntry>
+
+		for (const entry of weightEntries.value) {
+			dates[entry.date] = entry
+		}
+
+		return dates
+	})
+
+	const entryDates = computed(() => Object.keys(mappedEntryDates.value))
+
 	async function getWeights() {
-		const db = getConnection()
-		const result = await db.select('SELECT * FROM weights') as WeightEntry[]
-		weightEntries.value = result
+		weightStoreIsLoading.value = true
+		try {
+			const db = getConnection()
+			weightEntries.value = await db.select('SELECT * FROM weights')
+		} catch (error) {
+			console.error('Failed to fetch weights:', error)
+			// TODO: Consider adding error handling or notification here
+		} finally {
+			weightStoreIsLoading.value = false
+		}
 	}
 
-	async function createWeight(weight: number, date: string) {
+	function determineProgress(entry: WeightEntry, index: number): WeightProgress {
+		if (index === 0) {
+			return 'same'
+		}
+		const lastEntry = weightEntries.value[index - 1]
+
+		if (!lastEntry) {
+			return 'same'
+		}
+
+		if (entry.weight > lastEntry.weight) {
+			return 'increase'
+		}
+
+		if (entry.weight < lastEntry.weight) {
+			return 'decrease'
+		}
+
+		return 'same'
+	}
+
+	async function upsertWeight(weightEntry: WeightEntry) {
 		weightStoreIsLoading.value = true
 
 		try {
 			const db = getConnection()
-			const result = await db.execute('INSERT INTO weights (weight, date) VALUES (?, ?)', [weight, date])
+			const result = await db.execute('INSERT INTO weights (weight, date) VALUES (?, ?) ON CONFLICT(date) DO UPDATE SET weight = excluded.weight', [weightEntry.weight, weightEntry.date])
 
 			const newWeight: WeightEntry = {
 				id: result.lastInsertId,
-				weight,
-				date,
+				weight: weightEntry.weight,
+				date: weightEntry.date,
 			}
 
 			weightEntries.value.unshift(newWeight)
@@ -49,7 +91,10 @@ export const useWeightStore = defineStore('weightStore', () => {
 	return {
 		weightStoreIsLoading,
 		weightEntries,
+		parsedWeightHistory,
+		mappedEntryDates,
+		entryDates,
 		getWeights,
-		createWeight,
+		upsertWeight,
 	}
 })

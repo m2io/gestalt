@@ -6,3 +6,5 @@ export interface WeightEntry {
 	weight_display?: string
 	progress?: 'increase' | 'decrease' | 'same'
 }
+
+export type WeightProgress = 'increase' | 'decrease' | 'same'

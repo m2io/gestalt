@@ -2,6 +2,9 @@
 
 @theme {
 	--font-geist: 'geist', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	--color-blue: #0070f3;
+	--color-green: #20cda6;
+	--color-red: #e00;
 }
 
 @layer base {
