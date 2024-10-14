@@ -13,7 +13,7 @@ const emits = defineEmits<{
 
 <template>
 	<AppGenericList
-		key-field="id"
+		key-field="date"
 		:items="items"
 		@select="emits('select-weight', $event)"
 		@delete="emits('delete-weight', $event)"

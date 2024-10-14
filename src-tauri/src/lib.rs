@@ -8,8 +8,7 @@ pub fn run() {
             description: "create_initial_tables",
             sql: "
 						CREATE TABLE IF NOT EXISTS weights (
-								id      INTEGER PRIMARY KEY AUTOINCREMENT,
-								date    TEXT NOT NULL,
+								date    TEXT NOT NULL PRIMARY KEY UNIQUE,
 								weight  REAL NOT NULL
 						);
 				",

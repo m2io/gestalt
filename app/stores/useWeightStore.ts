@@ -7,12 +7,33 @@ export const useWeightStore = defineStore('weightStore', () => {
 	const weightEntries = ref<WeightEntry[]>([])
 
 	const parsedWeightHistory = computed<WeightEntry[]>(() => {
-		return weightEntries.value.map((entry, index) => ({
-			...entry,
-			weight_display: `${entry.weight} kg`,
-			date_display: dayjs(entry.date).format('MMM D, YYYY'),
-			progress: determineProgress(entry, index),
-		}))
+		const sortedEntries = [...weightEntries.value].sort((a, b) =>
+			dayjs(b.date).diff(dayjs(a.date)),
+		)
+
+		return sortedEntries.map((entry, index) => {
+			const weight_display = `${entry.weight} kg`
+			const date_display = dayjs(entry.date).format('MMM D, YYYY')
+			let progress: WeightProgress = 'same'
+
+			if (index < sortedEntries.length - 1) {
+				const nextEntry = sortedEntries[index + 1]
+				if (nextEntry) {
+					if (entry.weight > nextEntry.weight) {
+						progress = 'decrease'
+					} else if (entry.weight < nextEntry.weight) {
+						progress = 'increase'
+					}
+				}
+			}
+
+			return {
+				...entry,
+				weight_display,
+				date_display,
+				progress,
+			}
+		})
 	})
 
 	const mappedEntryDates = computed(() => {
@@ -25,7 +46,7 @@ export const useWeightStore = defineStore('weightStore', () => {
 		return dates
 	})
 
-	const entryDates = computed(() => Object.keys(mappedEntryDates.value))
+	const entryDates = computed(() => new Set(Object.keys(mappedEntryDates.value)))
 
 	async function getWeights() {
 		weightStoreIsLoading.value = true
@@ -40,45 +61,46 @@ export const useWeightStore = defineStore('weightStore', () => {
 		}
 	}
 
-	function determineProgress(entry: WeightEntry, index: number): WeightProgress {
-		if (index === 0) {
-			return 'same'
-		}
-		const lastEntry = weightEntries.value[index - 1]
-
-		if (!lastEntry) {
-			return 'same'
-		}
-
-		if (entry.weight > lastEntry.weight) {
-			return 'increase'
-		}
-
-		if (entry.weight < lastEntry.weight) {
-			return 'decrease'
-		}
-
-		return 'same'
-	}
-
 	async function upsertWeight(weightEntry: WeightEntry) {
 		weightStoreIsLoading.value = true
 
 		try {
 			const db = getConnection()
-			const result = await db.execute('INSERT INTO weights (weight, date) VALUES (?, ?) ON CONFLICT(date) DO UPDATE SET weight = excluded.weight', [weightEntry.weight, weightEntry.date])
+			await db.execute('INSERT INTO weights (weight, date) VALUES (?, ?) ON CONFLICT(date) DO UPDATE SET weight = excluded.weight', [weightEntry.weight, weightEntry.date])
 
 			const newWeight: WeightEntry = {
-				id: result.lastInsertId,
 				weight: weightEntry.weight,
 				date: weightEntry.date,
 			}
 
-			weightEntries.value.unshift(newWeight)
+			const index = weightEntries.value.findIndex((entry) => entry.date === newWeight.date)
+			if (index !== -1) {
+				weightEntries.value[index] = newWeight
+			} else {
+				weightEntries.value.push(newWeight)
+			}
 
 			return { data: newWeight, error: null }
 		} catch (err) {
 			console.error('Failed to create weight:', err)
+			return {
+				data: null,
+				error: err instanceof Error ? err : new Error(String(err)),
+			}
+		} finally {
+			weightStoreIsLoading.value = false
+		}
+	}
+
+	async function deleteWeight(weightEntry: WeightEntry) {
+		weightStoreIsLoading.value = true
+
+		try {
+			const db = getConnection()
+			await db.execute('DELETE FROM weights WHERE date = ?', [weightEntry.date])
+			weightEntries.value = weightEntries.value.filter((entry) => entry.date !== weightEntry.date)
+		} catch (err) {
+			console.error('Failed to delete weight:', err)
 			return {
 				data: null,
 				error: err instanceof Error ? err : new Error(String(err)),
@@ -96,5 +118,6 @@ export const useWeightStore = defineStore('weightStore', () => {
 		entryDates,
 		getWeights,
 		upsertWeight,
+		deleteWeight,
 	}
 })
