@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="T">
 import { vOnLongPress } from '@vueuse/components'
 
+// eslint-disable-next-line vue/require-valid-default-prop
 const { disableDelete = false, keyField = 'id', sortable = false, items = [] } = defineProps<{
 	items: T[]
 	disableDelete?: boolean

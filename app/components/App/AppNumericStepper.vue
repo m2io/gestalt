@@ -38,8 +38,9 @@ const stepFactor = computed(() => {
 })
 
 function increaseValue() {
-	if (max && modelValue.value! >= max)
+	if (max && modelValue.value! >= max) {
 		return
+	}
 
 	const newValue = (modelValue.value as number) + (steps * stepFactor.value)
 
@@ -47,8 +48,9 @@ function increaseValue() {
 }
 
 function decreaseValue() {
-	if (modelValue.value! <= min)
+	if (modelValue.value! <= min) {
 		return
+	}
 
 	const newValue = (modelValue.value as number) - (steps * stepFactor.value)
 

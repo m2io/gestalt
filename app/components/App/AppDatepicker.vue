@@ -35,8 +35,9 @@ const month = computed(() => date.value.month())
 const year = computed(() => date.value.year())
 
 function setDate(day: IDay) {
-	if (day.isDisabled)
+	if (day.isDisabled) {
 		return
+	}
 
 	initialDate.value = day.date
 	modelValue.value = day.date.format('YYYY-MM-DD')
