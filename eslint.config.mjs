@@ -20,6 +20,7 @@ export default withNuxt(
 			'style/brace-style': ['error', '1tbs', { allowSingleLine: true }],
 			'style/arrow-parens': ['error', 'always'],
 			'no-console': 'warn',
+			'curly': ['error', 'all'],
 			'vue/max-attributes-per-line': [
 				'error',
 				{
